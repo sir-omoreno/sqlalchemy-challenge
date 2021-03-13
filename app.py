@@ -23,14 +23,15 @@ app = Flask(__name__)
 
 @app.route("/")
 def main_page():
+    """ Simple route with a description of the available pages """
     return (
-        "API Available Routes:<br/>"
-        "/api/v1.0/precipitation<br/>"
-        "/api/v1.0/stations<br/>"
-        "/api/v1.0/tobs<br/>"
-        "/api/v1.0/start_date<br/>"
-        "/api/v1.0/start_date/end_date<br/>"
-        "IMPORTANT TIP: Put the start_date and end_date in 'YYYY-MM-DD' format<br/>"
+        "API Available Routes:<br><br>"
+        "/api/v1.0/precipitation<br>"
+        "/api/v1.0/stations<br>"
+        "/api/v1.0/tobs<br>"
+        "/api/v1.0/start_date<br>"
+        "/api/v1.0/start_date/end_date<br><br>"
+        "IMPORTANT TIP: Put the start_date and end_date in 'YYYY-MM-DD' format<br>"
         )
 
 
