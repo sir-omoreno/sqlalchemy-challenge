@@ -44,10 +44,16 @@ def precipitation():
     #
     last_year = dt.datetime.strptime(last_date[0], '%Y-%m-%d')
     one_year_ago = dt.date(last_year.year, last_year.month, last_year.day) - dt.timedelta(days=365)
+    query_to_retrieve = session.query(measurement.date, func.avg(measurement.prcp)).filter(measurement.date >= one_year_ago).group_by(measurement.date).all()
+
+    query_to_retrieve = session.query(measurement.station, measurement.date, measurement.prcp)\
+                    .filter(measurement.date >= one_year_ago).all()                                                                  
     
-
-
-
+    list = []
+    for i in query_to_retrieve:
+        dict = {"Station":i[0], "Date":i[1], "Precipitation":i[2]}
+        list.append(dict)
+    return jsonify(list)
 
 
 
