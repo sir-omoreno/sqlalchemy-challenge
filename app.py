@@ -111,5 +111,21 @@ def tobs():
     return jsonify(list)
 
 
+@app.route("/api/v1.0/<start>")
+def start(start):
+    session = Session(engine)
+
+    query = session.query(func.min(measurement.tobs),
+                          func.max(measurement.tobs),
+                          func.avg(measurement.tobs))\
+        .filter(measurement.date >= start)\
+        .order_by(measurement.date.desc()).all()
+
+    for i in query:
+        dict = {"Min Temp": i[0], "Max Temp": i[1], "Avg Temp": i[2]}
+
+    return jsonify(dict)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
