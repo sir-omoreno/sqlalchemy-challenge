@@ -21,6 +21,7 @@ station = Base.classes.station
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def main_page():
     """ Simple route with a description of the available pages. """
@@ -32,36 +33,48 @@ def main_page():
         "/api/v1.0/start_date<br>"
         "/api/v1.0/start_date/end_date<br><br>"
         "IMPORTANT TIP: Put the start_date and end_date in 'YYYY-MM-DD' format<br>"
-        )
+    )
+
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
     # Establishing connection to the DB, good practice to close after the using it
     session = Session(engine)
-    session.close()
+
     # Using code from the query from Part 1.
-    last_date = session.query(measurement.date).order_by(measurement.date.desc()).first()
+    last_date = session.query(measurement.date).order_by(
+        measurement.date.desc()).first()
     #
     last_year = dt.datetime.strptime(last_date[0], '%Y-%m-%d')
-    one_year_ago = dt.date(last_year.year, last_year.month, last_year.day) - dt.timedelta(days=365)
-    query_to_retrieve = session.query(measurement.date, func.avg(measurement.prcp)).filter(measurement.date >= one_year_ago).group_by(measurement.date).all()
+    one_year_ago = dt.date(last_year.year, last_year.month,
+                           last_year.day) - dt.timedelta(days=365)
+    query_to_retrieve = session.query(measurement.date, func.avg(measurement.prcp)).filter(
+        measurement.date >= one_year_ago).group_by(measurement.date).all()
 
     query_to_retrieve = session.query(measurement.station, measurement.date, measurement.prcp)\
-                    .filter(measurement.date >= one_year_ago).all()                                                                  
-    
+        .filter(measurement.date >= one_year_ago).all()
+
+    session.close()
+
     list = []
     for i in query_to_retrieve:
-        dict = {"Station":i[0], "Date":i[1], "Precipitation":i[2]}
+        dict = {"Station": i[0], "Date": i[1], "Precipitation": i[2]}
         list.append(dict)
     return jsonify(list)
 
 
+@app.route("/api/v1.0/stations")
+def stations():
+    # Establishing connection to the DB, good practice to close after the using it
+    session = Session(engine)
 
+    stations = session.query(station.station, station.name, station.latitude, station.longitude).all()
 
-
-
-
-
+    list = []
+    for i in stations:
+        dict = {"Station ID": i[0], "Station Name": i[1], "Station Latitude": i[2], "Station Longitude": i[3]}
+        list.append(dict)
+    return jsonify(list)
 
 if __name__ == "__main__":
     app.run(debug=True)
