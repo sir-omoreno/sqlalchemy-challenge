@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def main_page():
-    """ Simple route with a description of the available pages """
+    """ Simple route with a description of the available pages. """
     return (
         "API Available Routes:<br><br>"
         "/api/v1.0/precipitation<br>"
@@ -34,8 +34,13 @@ def main_page():
         "IMPORTANT TIP: Put the start_date and end_date in 'YYYY-MM-DD' format<br>"
         )
 
-
-
+@app.route("/api/v1.0/precipitation")
+def precipitation():
+    # Establishing connection to the DB, good practice to close after the using it
+    session = Session(engine)
+    session.close()
+    # Using code from the query from Part 1.
+    last_date = session.query(measurement.date).order_by(measurement.date.desc()).first()
 
 
 
