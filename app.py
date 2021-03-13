@@ -70,11 +70,19 @@ def stations():
 
     stations = session.query(station.station, station.name, station.latitude, station.longitude).all()
 
+    session.close()
+
     list = []
     for i in stations:
         dict = {"Station ID": i[0], "Station Name": i[1], "Station Latitude": i[2], "Station Longitude": i[3]}
         list.append(dict)
     return jsonify(list)
+
+
+@app.route("/api/v1.0/tobs")
+def tobs():
+    session = Session(engine)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
