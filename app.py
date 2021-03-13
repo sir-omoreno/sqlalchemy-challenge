@@ -41,7 +41,10 @@ def precipitation():
     session.close()
     # Using code from the query from Part 1.
     last_date = session.query(measurement.date).order_by(measurement.date.desc()).first()
-
+    #
+    last_year = dt.datetime.strptime(last_date[0], '%Y-%m-%d')
+    one_year_ago = dt.date(last_year.year, last_year.month, last_year.day) - dt.timedelta(days=365)
+    
 
 
 
