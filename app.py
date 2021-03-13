@@ -68,13 +68,15 @@ def stations():
     # Establishing connection to the DB, good practice to close after the using it
     session = Session(engine)
 
-    stations = session.query(station.station, station.name, station.latitude, station.longitude).all()
+    stations = session.query(
+        station.station, station.name, station.latitude, station.longitude).all()
 
     session.close()
 
     list = []
     for i in stations:
-        dict = {"Station ID": i[0], "Station Name": i[1], "Station Latitude": i[2], "Station Longitude": i[3]}
+        dict = {"Station ID": i[0], "Station Name": i[1],
+                "Station Latitude": i[2], "Station Longitude": i[3]}
         list.append(dict)
     return jsonify(list)
 
@@ -82,6 +84,31 @@ def stations():
 @app.route("/api/v1.0/tobs")
 def tobs():
     session = Session(engine)
+    last_date = session.query(measurement.date).order_by(
+        measurement.date.desc()).first()
+
+    last_year = dt.datetime.strptime(last_date[0], '%Y-%m-%d')
+    one_year_ago = dt.date(last_year.year, last_year.month,
+                           last_year.day) - dt.timedelta(days=365)
+
+    count = [measurement.station, func.count(measurement.station)]
+    active_stations = session.query(*count)\
+        .group_by(measurement.station)\
+        .order_by(func.count(measurement.station).desc()).all()
+
+    test = [measurement.date, measurement.tobs]
+    query_temps = session.query(*test)\
+        .filter(measurement.date >= one_year_ago)\
+        .filter(measurement.station == active_stations[0][0]).all()
+
+    session.close()
+
+    list = []
+    for i in query_temps:
+        dict = {"Date": i[0], "Temperature": i[1]}
+        list.append(dict)
+
+    return jsonify(list)
 
 
 if __name__ == "__main__":
